@@ -1,0 +1,31 @@
+# Ignore everything by default
+*
+
+# Allow specific code files
+!*.cs       # C# files
+!*.cshtml   # Razor view files
+!*.html     # HTML files
+!*.js       # JavaScript files
+!*.ts       # TypeScript files
+!*.css      # CSS files
+!*.scss     # SCSS files
+!*.json     # JSON files
+!*.xml      # XML files
+!*.sql      # SQL scripts
+!*.py       # Python scripts
+!*.java     # Java files
+!*.cpp      # C++ files
+!*.h        # Header files
+!*.sh       # Shell scripts
+
+# Allow project configuration files
+!*.sln      # Solution file for Visual Studio
+!*.csproj   # C# project files
+!*.vbproj   # VB.NET project files
+!*.xproj    # Legacy .NET project files
+
+# Allow the .gitignore file itself
+!.gitignore
+
+# Allow directories but exclude their contents (overridden by specific code files above)
+!*/
