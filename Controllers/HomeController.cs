@@ -1,31 +1,53 @@
-using System.Diagnostics;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using OcculusControlle_UI.Models;
 
 namespace OcculusControlle_UI.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IHttpClientFactory httpClientFactory)
     {
-        _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
-    public IActionResult Index()
+    public IActionResult Login()
     {
         return View();
     }
 
-    public IActionResult Privacy()
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
-        return View();
-    }
+        if (!ModelState.IsValid)
+        {
+            // Return the view with validations errors
+            return View(model);
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        // Construct the payload to send to the external API
+        var payload = new
+        {
+            email = model.Email,
+            password = model.Password
+        };
+
+        var client = _httpClientFactory.CreateClient();
+        var response = await client.PostAsJsonAsync("http://localhost:5164/api/Auth/login", payload);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<dynamic>();
+
+            // Save data to seesion
+            HttpContext.Session.SetString("Token", (string)result!.ToString());
+            return RedirectToAction("Index", "Home");
+        }
+
+        ModelState.AddModelError(string.Empty, "Invalid login attempt");
+        return View(model);
     }
 }
